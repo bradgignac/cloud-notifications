@@ -1,6 +1,6 @@
 # rcnotify
 
-rcnotify is a simple command-line application that polls Rackspace Cloud Feeds for activity on your account and sends notifications based on events in the feed.
+rcnotify is a simple command-line application that polls Rackspace Cloud Feeds for activity on your account and sends notifications based on events in the feed. This currently notifies about deletes from Rackspace Cloud Databases.
 
 ## Status
 

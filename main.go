@@ -20,14 +20,28 @@ func main() {
 
 	app.Flags = []cli.Flag{
 		cli.StringFlag{
-			Name:   "user, u",
-			Usage:  "Rackspace Cloud username",
-			EnvVar: "RCNOTIFY_USER",
+			Name:  "rackspace-user",
+			Usage: "Rackspace Cloud username",
 		},
 		cli.StringFlag{
-			Name:   "key, k",
-			Usage:  "Rackspace Cloud API key",
-			EnvVar: "RCNOTIFY_KEY",
+			Name:  "rackspace-key",
+			Usage: "Rackspace Cloud API key",
+		},
+		cli.StringFlag{
+			Name:  "twilio-account",
+			Usage: "Twilio account ID",
+		},
+		cli.StringFlag{
+			Name:  "twilio-key",
+			Usage: "Twilio API key",
+		},
+		cli.StringFlag{
+			Name:  "twilio-from",
+			Usage: "Twilio number",
+		},
+		cli.StringFlag{
+			Name:  "twilio-to",
+			Usage: "End-user number",
 		},
 	}
 
@@ -37,15 +51,26 @@ func main() {
 }
 
 func poll(c *cli.Context) {
-	user := arg(c, "user")
-	key := arg(c, "key")
+	twAccount := arg(c, "twilio-account")
+	twKey := arg(c, "twilio-key")
+	twFrom := arg(c, "twilio-from")
+	twTo := arg(c, "twilio-to")
 
-	notifier := &notifier.Console{}
+	notifier := &notifier.Twilio{
+		Account: twAccount,
+		Token:   twKey,
+		From:    twFrom,
+		To:      twTo,
+	}
+
+	rsUser := arg(c, "rackspace-user")
+	rsKey := arg(c, "rackspace-key")
+
 	ingestor := &ingestor.CloudFeeds{
 		Notifier: notifier,
 		Interval: 10 * time.Second,
-		User:     user,
-		Key:      key,
+		User:     rsUser,
+		Key:      rsKey,
 	}
 
 	err := ingestor.Start()

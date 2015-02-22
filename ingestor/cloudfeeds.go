@@ -79,7 +79,7 @@ func (i *CloudFeeds) readEvents() {
 
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
-		log.Printf("Failed to create request - %v", err)
+		log.Printf("Failed to create Cloud Feeds request - %v", err)
 		return
 	}
 
@@ -89,7 +89,7 @@ func (i *CloudFeeds) readEvents() {
 	client := &http.Client{}
 	res, err := client.Do(req)
 	if err != nil {
-		log.Printf("Failed to read events - %v", err)
+		log.Printf("Failed to read Cloud Feeds events - %v", err)
 		return
 	}
 	defer res.Body.Close()
@@ -98,7 +98,7 @@ func (i *CloudFeeds) readEvents() {
 	d := json.NewDecoder(res.Body)
 	err = d.Decode(&data)
 	if err != nil {
-		log.Printf("Failed to parse feeds response - %v", err)
+		log.Printf("Failed to parse Cloud Feeds response - %v", err)
 		return
 	}
 
@@ -124,5 +124,5 @@ func (i *CloudFeeds) readEvents() {
 		i.marker = id.(string)
 	}
 
-	log.Printf("Successfully polled events for user \"%s\", tenant \"%s\", marker: \"%s\"", i.User, i.tenant, i.marker)
+	log.Printf("Successfully polled %d event(s) for user \"%s\", tenant \"%s\", marker: \"%s\"", len(entries), i.User, i.tenant, i.marker)
 }

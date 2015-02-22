@@ -8,10 +8,12 @@ This project is pretty much a hack. To turn it into something more usable, the f
 
 - Tests.
 - Code that isn't awful.
+- Specify start time on first poll.
 - Config syntax for specifying notifiers.
 - Config syntax for specifying notification types.
 - Support for more event feeds and more event types.
 - Cooperative work across multiple worker threads and worker processes.
+- Split ingestion from notification.
 
 ## Installation
 
@@ -25,10 +27,15 @@ $ go install github.com/bradgignac/rcnotify
 
 ## Usage
 
-Start the daemon:
+Start the application:
 
 ```
-$ rcnotify -u MY_USER -k MY_API_KEY -p "my phone number"
+$ rcnotify --rackspace-user RACKSPACE_USER \
+    --rackspace-key RACKSPACE_KEY \
+    --twilio-user TWILIO_ACCOUNT \
+    --twilio-key TWILIO_TOKEN \
+    --twilio-from TWILIO_NUMBER \
+    --twilio-to MY_PHONE_NUMBER
 ```
 
 ## License

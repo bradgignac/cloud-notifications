@@ -14,10 +14,11 @@ This project is pretty much a hack. To turn it into something more usable, the f
 - Support for more event feeds and more event types.
 - Cooperative work across multiple worker threads and worker processes.
 - Split ingestion from notification.
+- Metrics exposed through expvar.
 
 ## Installation
 
-To install Rackspace Cloud Notifications, you will need to have Go v1.3 or higher installed. Simply run:
+To install Rackspace Cloud Notifications, you will need to have Go v1.4 or higher installed. Simply run:
 
 ```
 $ go install github.com/bradgignac/rcnotify

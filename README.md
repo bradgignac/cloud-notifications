@@ -1,6 +1,6 @@
-# rcnotify
+# cloud-notifications
 
-rcnotify is a simple command-line application that polls Rackspace Cloud Feeds for activity on your account and sends notifications based on events in the feed. This currently notifies about deletes from Rackspace Cloud Databases.
+Cloud Notifications is a simple command-line application that polls Rackspace Cloud Feeds for activity on your account and sends notifications based on events in the feed. This currently notifies about deletes from Rackspace Cloud Databases.
 
 ## Status
 
@@ -18,7 +18,7 @@ This project is pretty much a hack. To turn it into something more usable, the f
 
 ## Installation
 
-To install Rackspace Cloud Notifications, you will need to have Go v1.4 or higher installed. Simply run:
+To install Cloud Notifications, you will need to have Go v1.4 or higher installed. Simply run:
 
 ```
 $ go install github.com/bradgignac/rcnotify
@@ -41,4 +41,4 @@ $ rcnotify --rackspace-user RACKSPACE_USER \
 
 ## License
 
-rcnotify is released under the [MIT License](LICENSE).
+Cloud Notifications is released under the [MIT License](LICENSE).

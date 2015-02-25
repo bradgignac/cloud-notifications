@@ -72,10 +72,16 @@ func (i *CloudFeeds) authenticate() error {
 }
 
 func (i *CloudFeeds) readEvents() {
+	start := time.Now().Format(time.RFC3339Nano)
 	url := fmt.Sprintf("https://dfw.feeds.api.rackspacecloud.com/dbaas/events/%s/", i.tenant)
+
 	if i.marker != "" {
 		url = fmt.Sprintf("%s?marker=%s", url, i.marker)
+	} else {
+		url = fmt.Sprintf("%s?startingAt=%s", url, start)
 	}
+
+	log.Printf("Polling feed at url - %s", url)
 
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
@@ -101,6 +107,14 @@ func (i *CloudFeeds) readEvents() {
 		log.Printf("Failed to parse Cloud Feeds response - %v", err)
 		return
 	}
+
+	if res.StatusCode != 200 {
+		// TODO: Cloud Feeds needs to fix their list here.
+		log.Printf("Bad response from Cloud feeds - %v", data)
+		return
+	}
+
+	fmt.Println(data)
 
 	feed := data["feed"].(map[string]interface{})
 	entries := feed["entry"].([]interface{})

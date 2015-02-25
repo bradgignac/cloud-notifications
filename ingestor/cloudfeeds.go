@@ -8,7 +8,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/bradgignac/rcnotify/notifier"
+	"github.com/bradgignac/cloud-notifications/notifier"
 )
 
 // CloudFeeds ingests activity from Rackspace Cloud Feeds.

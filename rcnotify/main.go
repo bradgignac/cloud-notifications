@@ -5,8 +5,8 @@ import (
 	"os"
 	"time"
 
-	"github.com/bradgignac/rcnotify/ingestor"
-	"github.com/bradgignac/rcnotify/notifier"
+	"github.com/bradgignac/cloud-notifications/ingestor"
+	"github.com/bradgignac/cloud-notifications/notifier"
 	"github.com/codegangsta/cli"
 )
 

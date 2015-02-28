@@ -17,8 +17,8 @@ ingestor:
 notifier:
   type: twilio
   options:
-    user: foo
-    key: bar
+    account: foo
+    token: bar
     from: from
     to: to
 

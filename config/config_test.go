@@ -1,4 +1,4 @@
-package main
+package config
 
 import (
 	"testing"
@@ -49,10 +49,10 @@ func (s *ConfigSuite) TestNotifierConfig(c *C) {
 	c.Assert(err, IsNil)
 	c.Assert(notifier.Type, Equals, "twilio")
 	c.Assert(notifier.Options, DeepEquals, map[string]interface{}{
-		"user": "foo",
-		"key":  "bar",
-		"from": "from",
-		"to":   "to",
+		"account": "foo",
+		"token":   "bar",
+		"from":    "from",
+		"to":      "to",
 	})
 }
 

@@ -2,11 +2,23 @@ package notifier
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"log"
 	"net/http"
 	"net/url"
 	"strings"
+)
+
+var (
+	// ErrAccountMissing indicates the account option is missing.
+	ErrAccountMissing = errors.New("Twilio notifier requires account option")
+	// ErrTokenMissing indicates the token option is missing.
+	ErrTokenMissing = errors.New("Twilio notifier requires token option")
+	// ErrFromMissing indicates the from option is missing.
+	ErrFromMissing = errors.New("Twilio notifier requires from option")
+	// ErrToMissing indicates the to option is missing.
+	ErrToMissing = errors.New("Twilio notifier requires token option")
 )
 
 // Twilio sends notifications over SMS.
@@ -15,6 +27,31 @@ type Twilio struct {
 	Token   string
 	From    string
 	To      string
+}
+
+// NewTwilioNotifier creates a new Twilio notifier with the provided options.
+func NewTwilioNotifier(options map[string]interface{}) (*Twilio, error) {
+	account, ok := options["account"]
+	if !ok {
+		return nil, ErrAccountMissing
+	}
+
+	token, ok := options["token"]
+	if !ok {
+		return nil, ErrTokenMissing
+	}
+
+	from, ok := options["from"]
+	if !ok {
+		return nil, ErrFromMissing
+	}
+
+	to, ok := options["to"]
+	if !ok {
+		return nil, ErrToMissing
+	}
+
+	return &Twilio{account.(string), token.(string), from.(string), to.(string)}, nil
 }
 
 // Notify logs a notification to the console.

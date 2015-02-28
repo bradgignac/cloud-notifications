@@ -5,6 +5,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/bradgignac/cloud-notifications/config"
 	"github.com/bradgignac/cloud-notifications/ingestor"
 	"github.com/bradgignac/cloud-notifications/notifier"
 	"github.com/codegangsta/cli"
@@ -28,20 +29,8 @@ func main() {
 			Usage: "Rackspace Cloud API key",
 		},
 		cli.StringFlag{
-			Name:  "twilio-account",
-			Usage: "Twilio account ID",
-		},
-		cli.StringFlag{
-			Name:  "twilio-key",
-			Usage: "Twilio API key",
-		},
-		cli.StringFlag{
-			Name:  "twilio-from",
-			Usage: "Twilio number",
-		},
-		cli.StringFlag{
-			Name:  "twilio-to",
-			Usage: "End-user number",
+			Name:  "config, c",
+			Usage: "Cloud Notifications config file",
 		},
 	}
 
@@ -51,16 +40,16 @@ func main() {
 }
 
 func poll(c *cli.Context) {
-	twAccount := arg(c, "twilio-account")
-	twKey := arg(c, "twilio-key")
-	twFrom := arg(c, "twilio-from")
-	twTo := arg(c, "twilio-to")
+	config, err := config.LoadYAML(c.String("config"))
+	if err != nil {
+		log.Fatalf("Failed to read config: %v", err)
+		os.Exit(1)
+	}
 
-	notifier := &notifier.Twilio{
-		Account: twAccount,
-		Token:   twKey,
-		From:    twFrom,
-		To:      twTo,
+	notifier, err := notifier.New(config.Notifier.Type, config.Notifier.Options)
+	if err != nil {
+		log.Fatalf("Failed to instantiate notifier: %v", err)
+		os.Exit(1)
 	}
 
 	rsUser := arg(c, "rackspace-user")
@@ -73,9 +62,10 @@ func poll(c *cli.Context) {
 		Key:      rsKey,
 	}
 
-	err := ingestor.Start()
+	err = ingestor.Start()
 	if err != nil {
 		log.Fatalf("Failed to start ingestor: %v", err)
+		os.Exit(1)
 	}
 }
 

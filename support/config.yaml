@@ -1,0 +1,26 @@
+endpoints:
+- https://dfw.feeds.api.rackspacecloud.com
+- https://iad.feeds.api.rackspacecloud.com
+- https://ord.feeds.api.rackspacecloud.com
+
+feeds:
+- backup_events_obs
+- bigdata_events_obs
+- ssl_usagesummary_events_obs
+
+ingestor:
+  type: rackspace
+  options:
+    user: foo
+    key: bar
+
+notifier:
+  type: twilio
+  options:
+    user: foo
+    key: bar
+    from: from
+    to: to
+
+coordinator:
+  type: memory

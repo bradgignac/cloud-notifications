@@ -8,6 +8,8 @@ import (
 	"net/http"
 	"net/url"
 	"strings"
+
+	"github.com/bradgignac/cloud-notifications/config"
 )
 
 var (
@@ -31,27 +33,18 @@ type Twilio struct {
 
 // NewTwilioNotifier creates a new Twilio notifier with the provided options.
 func NewTwilioNotifier(options map[string]interface{}) (*Twilio, error) {
-	account, ok := options["account"]
-	if !ok {
-		return nil, ErrAccountMissing
+	opts, err := config.ReadOptions([]config.Option{
+		config.Option{Key: "account", Env: "TWILIO_ACCOUNT"},
+		config.Option{Key: "token", Env: "TWILIO_TOKEN"},
+		config.Option{Key: "from"},
+		config.Option{Key: "to"},
+	}, options)
+
+	if err != nil {
+		return nil, err
 	}
 
-	token, ok := options["token"]
-	if !ok {
-		return nil, ErrTokenMissing
-	}
-
-	from, ok := options["from"]
-	if !ok {
-		return nil, ErrFromMissing
-	}
-
-	to, ok := options["to"]
-	if !ok {
-		return nil, ErrToMissing
-	}
-
-	return &Twilio{account.(string), token.(string), from.(string), to.(string)}, nil
+	return &Twilio{opts["account"], opts["token"], opts["from"], opts["to"]}, nil
 }
 
 // Notify logs a notification to the console.

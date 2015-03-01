@@ -6,9 +6,11 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strconv"
 	"strings"
 	"time"
 
+	"github.com/bradgignac/cloud-notifications/config"
 	"github.com/bradgignac/cloud-notifications/notifier"
 )
 
@@ -32,26 +34,24 @@ type Rackspace struct {
 
 // NewRackspaceIngestor creates a Rackspace ingestor from the provided options.
 func NewRackspaceIngestor(options map[string]interface{}) (*Rackspace, error) {
-	user, ok := options["user"]
-	if !ok {
-		return nil, ErrUserMissing
+	opts, err := config.ReadOptions([]config.Option{
+		config.Option{Key: "user", Env: "RACKSPACE_USER"},
+		config.Option{Key: "key", Env: "RACKSPACE_KEY"},
+		config.Option{Key: "interval"},
+	}, options)
+
+	if err != nil {
+		return nil, err
 	}
 
-	key, ok := options["key"]
-	if !ok {
-		return nil, ErrKeyMissing
+	intervalValue, err := strconv.ParseInt(opts["interval"], 10, 0)
+	if err != nil {
+		return nil, err
 	}
 
-	interval, ok := options["interval"]
-	if !ok {
-		interval = 10
-	}
+	interval := time.Duration(intervalValue) * time.Second
 
-	return &Rackspace{
-		Interval: time.Duration(interval.(int)) * time.Second,
-		User:     user.(string),
-		Key:      key.(string),
-	}, nil
+	return &Rackspace{Interval: interval, User: opts["user"], Key: opts["key"]}, nil
 }
 
 // Start begins polling Cloud Feeds.

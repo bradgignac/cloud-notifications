@@ -6,13 +6,14 @@ Cloud Notifications is a simple command-line application that polls Rackspace Cl
 
 This project is pretty much a hack. To turn it into something more usable, the following features are needed:
 
-- Tests.
+- Tests and benchmarks.
 - Code that isn't awful.
 - Specify start time on first poll.
 - Config syntax for specifying notifiers.
 - Config syntax for specifying notification types.
 - Support for more event feeds and more event types.
 - Cooperative work across multiple worker threads and worker processes.
+- Respond to backpressure from a feed.
 - Split ingestion from notification.
 - Metrics exposed through expvar.
 

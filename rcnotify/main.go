@@ -3,8 +3,8 @@ package main
 import (
 	"log"
 	"os"
-	"time"
 
+	"github.com/bradgignac/cloud-notifications/config"
 	"github.com/bradgignac/cloud-notifications/ingestor"
 	"github.com/bradgignac/cloud-notifications/notifier"
 	"github.com/codegangsta/cli"
@@ -20,28 +20,8 @@ func main() {
 
 	app.Flags = []cli.Flag{
 		cli.StringFlag{
-			Name:  "rackspace-user",
-			Usage: "Rackspace Cloud username",
-		},
-		cli.StringFlag{
-			Name:  "rackspace-key",
-			Usage: "Rackspace Cloud API key",
-		},
-		cli.StringFlag{
-			Name:  "twilio-account",
-			Usage: "Twilio account ID",
-		},
-		cli.StringFlag{
-			Name:  "twilio-key",
-			Usage: "Twilio API key",
-		},
-		cli.StringFlag{
-			Name:  "twilio-from",
-			Usage: "Twilio number",
-		},
-		cli.StringFlag{
-			Name:  "twilio-to",
-			Usage: "End-user number",
+			Name:  "config, c",
+			Usage: "Cloud Notifications config file",
 		},
 	}
 
@@ -51,31 +31,31 @@ func main() {
 }
 
 func poll(c *cli.Context) {
-	twAccount := arg(c, "twilio-account")
-	twKey := arg(c, "twilio-key")
-	twFrom := arg(c, "twilio-from")
-	twTo := arg(c, "twilio-to")
-
-	notifier := &notifier.Twilio{
-		Account: twAccount,
-		Token:   twKey,
-		From:    twFrom,
-		To:      twTo,
+	config, err := config.LoadYAML(c.String("config"))
+	if err != nil {
+		log.Fatalf("Failed to read config: %v", err)
+		os.Exit(1)
 	}
 
-	rsUser := arg(c, "rackspace-user")
-	rsKey := arg(c, "rackspace-key")
-
-	ingestor := &ingestor.CloudFeeds{
-		Notifier: notifier,
-		Interval: 10 * time.Second,
-		User:     rsUser,
-		Key:      rsKey,
+	n, err := notifier.New(config.Notifier.Type, config.Notifier.Options)
+	if err != nil {
+		log.Fatalf("Failed to instantiate notifier: %v", err)
+		os.Exit(1)
 	}
 
-	err := ingestor.Start()
+	i, err := ingestor.New(config.Ingestor.Type, config.Ingestor.Options)
+	if err != nil {
+		log.Fatalf("Failed to instantiate ingestor: %v", err)
+		os.Exit(1)
+	}
+
+	ingestor := i.(*ingestor.Rackspace)
+	ingestor.Notifier = n
+
+	err = ingestor.Start()
 	if err != nil {
 		log.Fatalf("Failed to start ingestor: %v", err)
+		os.Exit(1)
 	}
 }
 

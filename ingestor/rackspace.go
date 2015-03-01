@@ -2,17 +2,27 @@ package ingestor
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"log"
 	"net/http"
+	"strconv"
 	"strings"
 	"time"
 
+	"github.com/bradgignac/cloud-notifications/config"
 	"github.com/bradgignac/cloud-notifications/notifier"
 )
 
-// CloudFeeds ingests activity from Rackspace Cloud Feeds.
-type CloudFeeds struct {
+var (
+	// ErrUserMissing indicates the user option is missing.
+	ErrUserMissing = errors.New("Rackspace ingestor requires account option")
+	// ErrKeyMissing indicates the key option is missing.
+	ErrKeyMissing = errors.New("Rackspace ingestor requires account option")
+)
+
+// Rackspace ingests activity from Rackspace Cloud Feeds.
+type Rackspace struct {
 	Notifier notifier.Notifier
 	Interval time.Duration
 	User     string
@@ -22,8 +32,30 @@ type CloudFeeds struct {
 	marker   string
 }
 
+// NewRackspaceIngestor creates a Rackspace ingestor from the provided options.
+func NewRackspaceIngestor(options map[string]interface{}) (*Rackspace, error) {
+	opts, err := config.ReadOptions([]config.Option{
+		config.Option{Key: "user", Env: "RACKSPACE_USER"},
+		config.Option{Key: "key", Env: "RACKSPACE_KEY"},
+		config.Option{Key: "interval"},
+	}, options)
+
+	if err != nil {
+		return nil, err
+	}
+
+	intervalValue, err := strconv.ParseInt(opts["interval"], 10, 0)
+	if err != nil {
+		return nil, err
+	}
+
+	interval := time.Duration(intervalValue) * time.Second
+
+	return &Rackspace{Interval: interval, User: opts["user"], Key: opts["key"]}, nil
+}
+
 // Start begins polling Cloud Feeds.
-func (i *CloudFeeds) Start() error {
+func (i *Rackspace) Start() error {
 	err := i.authenticate()
 	if err != nil {
 		return err
@@ -35,7 +67,7 @@ func (i *CloudFeeds) Start() error {
 	}
 }
 
-func (i *CloudFeeds) authenticate() error {
+func (i *Rackspace) authenticate() error {
 	body := fmt.Sprintf(`{
 		"auth": {
 			"RAX-KSKEY:apiKeyCredentials": {
@@ -71,7 +103,7 @@ func (i *CloudFeeds) authenticate() error {
 	return nil
 }
 
-func (i *CloudFeeds) readEvents() {
+func (i *Rackspace) readEvents() {
 	start := time.Now().Format(time.RFC3339Nano)
 	url := fmt.Sprintf("https://dfw.feeds.api.rackspacecloud.com/dbaas/events/%s/", i.tenant)
 

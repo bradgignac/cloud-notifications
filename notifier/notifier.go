@@ -2,8 +2,6 @@ package notifier
 
 import "fmt"
 
-var notifiers = make(map[string]Notifier)
-
 // Notifier provides an interface for implementing multiple notification types.
 type Notifier interface {
 	Notify(n string)

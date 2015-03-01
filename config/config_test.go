@@ -37,8 +37,9 @@ func (s *ConfigSuite) TestIngestorConfig(c *C) {
 	c.Assert(err, IsNil)
 	c.Assert(ingestor.Type, Equals, "rackspace")
 	c.Assert(ingestor.Options, DeepEquals, map[string]interface{}{
-		"user": "foo",
-		"key":  "bar",
+		"user":     "foo",
+		"key":      "bar",
+		"interval": 10,
 	})
 }
 

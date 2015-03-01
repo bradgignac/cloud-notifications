@@ -2,6 +2,7 @@ package ingestor
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"log"
 	"net/http"
@@ -11,8 +12,15 @@ import (
 	"github.com/bradgignac/cloud-notifications/notifier"
 )
 
-// CloudFeeds ingests activity from Rackspace Cloud Feeds.
-type CloudFeeds struct {
+var (
+	// ErrUserMissing indicates the user option is missing.
+	ErrUserMissing = errors.New("Rackspace ingestor requires account option")
+	// ErrKeyMissing indicates the key option is missing.
+	ErrKeyMissing = errors.New("Rackspace ingestor requires account option")
+)
+
+// Rackspace ingests activity from Rackspace Cloud Feeds.
+type Rackspace struct {
 	Notifier notifier.Notifier
 	Interval time.Duration
 	User     string
@@ -22,8 +30,32 @@ type CloudFeeds struct {
 	marker   string
 }
 
+// NewRackspaceIngestor creates a Rackspace ingestor from the provided options.
+func NewRackspaceIngestor(options map[string]interface{}) (*Rackspace, error) {
+	user, ok := options["user"]
+	if !ok {
+		return nil, ErrUserMissing
+	}
+
+	key, ok := options["key"]
+	if !ok {
+		return nil, ErrKeyMissing
+	}
+
+	interval, ok := options["interval"]
+	if !ok {
+		interval = 10
+	}
+
+	return &Rackspace{
+		Interval: time.Duration(interval.(int)) * time.Second,
+		User:     user.(string),
+		Key:      key.(string),
+	}, nil
+}
+
 // Start begins polling Cloud Feeds.
-func (i *CloudFeeds) Start() error {
+func (i *Rackspace) Start() error {
 	err := i.authenticate()
 	if err != nil {
 		return err
@@ -35,7 +67,7 @@ func (i *CloudFeeds) Start() error {
 	}
 }
 
-func (i *CloudFeeds) authenticate() error {
+func (i *Rackspace) authenticate() error {
 	body := fmt.Sprintf(`{
 		"auth": {
 			"RAX-KSKEY:apiKeyCredentials": {
@@ -71,7 +103,7 @@ func (i *CloudFeeds) authenticate() error {
 	return nil
 }
 
-func (i *CloudFeeds) readEvents() {
+func (i *Rackspace) readEvents() {
 	start := time.Now().Format(time.RFC3339Nano)
 	url := fmt.Sprintf("https://dfw.feeds.api.rackspacecloud.com/dbaas/events/%s/", i.tenant)
 

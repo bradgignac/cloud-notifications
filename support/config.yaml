@@ -13,6 +13,7 @@ ingestor:
   options:
     user: foo
     key: bar
+    interval: 10
 
 notifier:
   type: twilio
